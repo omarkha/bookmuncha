@@ -13,3 +13,4 @@ torch==2.2.2
 pdfminer==20191125
 transformers==4.47.1
 pydantic==2.10.4
+pytesseract==0.3.13
