@@ -1,12 +1,8 @@
-
-#FAST PROCESSING, Comprehensive PARAGRAPH
 import ebooklib.epub
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException, Body
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import os
 import io
-from dotenv import load_dotenv
 from pdfminer.high_level import extract_text
 import ebooklib
 from docx import Document
@@ -15,15 +11,14 @@ import pytesseract
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import re
+
 # FastAPI app setup
 app = FastAPI()
 
 # Add CORS middleware
 origins = [
     "*",
-    "http://127.0.0.1:3000",
-    "https://askthebook.onrender.com",
-    "com.bravestartups.askthebook"
+    "https://bookmuncha.onrender.com",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -33,21 +28,9 @@ app.add_middleware(
     allow_headers=["Content-Type", "X_API_KEY"]
 )
 
-# Load environment variables
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
-
-# Helper function to verify API key
-def verify_api_key(request: Request):
-    if request.method == "OPTIONS":
-        return None  # Allow preflight requests
-    api_key = request.headers.get("X_API_KEY")
-    if api_key != API_KEY:
-        raise HTTPException(status_code=403, detail="Unauthorized, invalid API key")
 
 # Load embedding model
 embedding_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-
 
 def split_into_paragraphs(text):
     # Normalize spaces and remove excessive newlines
@@ -96,8 +79,6 @@ def split_into_paragraphs(text):
 
     return paragraph_data
 
-
-
 def process_file(file_stream, file_type):
     file_stream = io.BytesIO(file_stream)
 
@@ -136,13 +117,10 @@ def process_file(file_stream, file_type):
 
     return page_data
 
-
-
-
 # Upload endpoint
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...), request: Request = None):
-    verify_api_key(request)
+
 
     file_type = file.filename.rsplit('.', 1)[-1].lower()
 
@@ -157,7 +135,6 @@ async def upload_file(file: UploadFile = File(...), request: Request = None):
 # Answer endpoint (modified to avoid summarization)
 @app.post("/api/answer")
 async def get_answers(request: Request, data: dict = Body(...)):
-    verify_api_key(request)
 
     question = data.get("question", "")
     chunks = data.get("chunks", [])
