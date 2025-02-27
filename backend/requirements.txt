@@ -4,6 +4,7 @@ numpy==1.26.4
 uvicorn==0.34.0
 fastapi==0.115.6
 pdfminer==20191125
+pdfminer.six==20201018
 python-docx==1.1.2
 pillow==11.0.0
 sentence-transformers==3.3.1
